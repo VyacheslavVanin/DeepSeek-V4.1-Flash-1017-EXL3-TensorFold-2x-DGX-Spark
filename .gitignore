@@ -1,4 +1,5 @@
 .env
+.env.mia-eaq
 logs/
 __pycache__/
 *.pyc

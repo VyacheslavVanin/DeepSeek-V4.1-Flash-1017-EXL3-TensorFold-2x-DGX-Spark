@@ -3,6 +3,8 @@
 # rendezvous port, then rank 1 on the worker, then wait until the API answers. First start: ~15 min (rank caches);
 # later starts: ~2-4 min.
 set -euo pipefail
+# This checkout serves the Mia EAQ variant by default. Override with ENV_FILE=.env (or another file) when needed.
+export ENV_FILE="${ENV_FILE:-.env.mia-eaq}"
 # shellcheck source=scripts/common.sh
 . "$(dirname "$0")/scripts/common.sh"
 
@@ -12,6 +14,12 @@ fi
 mkdir -p "$CACHE_DIR" "$LOGS"
 wssh "mkdir -p '$CACHE_DIR'"
 "$ROOT/scripts/build_extensions.sh" || exit 1    # before the weights load (see the script)
+
+if [ -n "${MAX_TOKENS:-}" ]; then
+  case "$MAX_TOKENS" in
+    ''|*[!0-9]*|0) echo "MAX_TOKENS must be a positive integer, not '$MAX_TOKENS'" >&2; exit 1 ;;
+  esac
+fi
 
 run_args() {  # $1 = rank. Every TF_DS_* setting below is explained in docs/WHAT-I-CHANGED.md
   local r=$1 key=""
@@ -32,7 +40,7 @@ run_args() {  # $1 = rank. Every TF_DS_* setting below is explained in docs/WHAT
 --entrypoint tensorfold $IMAGE serve /model --tp 2 --rank $r --master $HEAD_IP
 --host $BIND_HOST --port $PORT --name $SERVED_NAME $( [ -n "${SERVED_ALIAS:-}" ] && echo "--alias $SERVED_ALIAS" )
 $( [ -n "$key" ] && echo "--api-key-file /run/keys" )
---context $CONTEXT $( [ "${VISION:-1}" = 1 ] && echo --vision ) --parallel $PARALLEL --mtp-drafts $MTP_DRAFTS
+--context $CONTEXT $( [ "${VISION:-1}" = 1 ] && echo --vision ) --parallel $PARALLEL $( [ -n "${MAX_TOKENS:-}" ] && echo --max-tokens $MAX_TOKENS ) --mtp-drafts $MTP_DRAFTS
 --temperature $TEMPERATURE --top-p $TOP_P $( [ "${THINKING:-0}" = 1 ] && echo --thinking || echo --no-thinking )
 $( [ -n "${REASONING_EFFORT:-}" ] && echo --reasoning-effort $REASONING_EFFORT ) --no-update-check
 EOF

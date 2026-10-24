@@ -2,13 +2,16 @@
 # shellcheck shell=bash
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-if [ ! -f "$ROOT/.env" ]; then
-  echo "no $ROOT/.env: copy .env.example to .env and edit it" >&2
+# ENV_FILE selects an alternate recipe file (for example .env.mia-eaq); the default is still .env.
+ENV_FILE="${ENV_FILE:-$ROOT/.env}"
+case "$ENV_FILE" in /*) ;; *) ENV_FILE="$ROOT/$ENV_FILE" ;; esac
+if [ ! -f "$ENV_FILE" ]; then
+  echo "no $ENV_FILE: copy .env.example to .env and edit it" >&2
   exit 1
 fi
 set -a
-# shellcheck disable=SC1091
-. "$ROOT/.env"
+# shellcheck disable=SC1090
+. "$ENV_FILE"
 set +a
 
 API="http://${BIND_HOST/0.0.0.0/127.0.0.1}:${PORT}/v1"

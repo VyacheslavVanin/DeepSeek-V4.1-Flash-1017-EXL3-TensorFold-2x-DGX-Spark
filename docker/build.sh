@@ -5,8 +5,9 @@ set -euo pipefail
 # shellcheck source=../scripts/common.sh
 . "$(dirname "$0")/../scripts/common.sh"
 
-log "building $IMAGE from $TF_REPO @ $TF_COMMIT"
-docker build --build-arg TF_REPO="$TF_REPO" --build-arg TF_COMMIT="$TF_COMMIT" -t "$IMAGE" "$ROOT/docker"
+log "building $IMAGE from $TF_REPO @ $TF_COMMIT (base ${BASE_IMAGE:-nvcr.io/nvidia/pytorch:26.07-py3})"
+docker build --build-arg BASE_IMAGE="${BASE_IMAGE:-nvcr.io/nvidia/pytorch:26.07-py3}" \
+  --build-arg TF_REPO="$TF_REPO" --build-arg TF_COMMIT="$TF_COMMIT" -t "$IMAGE" "$ROOT/docker"
 log "copying $IMAGE to the worker ($WORKER_SSH)"
 docker save "$IMAGE" | ssh -o BatchMode=yes "$WORKER_SSH" docker load
 head_id=$(docker images "$IMAGE" --format '{{.ID}}')

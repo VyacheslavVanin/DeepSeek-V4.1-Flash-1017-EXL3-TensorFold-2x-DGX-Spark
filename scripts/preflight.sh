@@ -30,7 +30,7 @@ else
 fi
 for d in "$MODEL_VIEW/model" "$MODEL_VIEW/engram"; do [ -d "\$d" ] || echo "FAIL missing \$d"; done
 [ -f "$MODEL_VIEW/model/chat_template.jinja" ] || echo "FAIL missing $MODEL_VIEW/model/chat_template.jinja"
-n=\$(ls "$MODEL_VIEW"/model/*.safetensors 2>/dev/null | wc -l); [ "\$n" -ge 43 ] || echo "FAIL \$n of 43 weight shards"
+n=\$(ls "$MODEL_VIEW"/model/*.safetensors 2>/dev/null | wc -l); [ "\$n" -ge "${MIN_WEIGHT_SHARDS:-43}" ] || echo "FAIL \$n of ${MIN_WEIGHT_SHARDS:-43} weight shards"
 docker image inspect "$IMAGE" --format '{{.Id}}' 2>/dev/null | sed 's/^/IMAGE /' || echo "FAIL no image $IMAGE"
 for dev in \$(echo "$RDMA_DEVICES" | tr ',' ' '); do
   # The engine's RDMA gather sends 4096-byte packets. RoCE gets that MTU only when the netdev MTU is ~4200 or more

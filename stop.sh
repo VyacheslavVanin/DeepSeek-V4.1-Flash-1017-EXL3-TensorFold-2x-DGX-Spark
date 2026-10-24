@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Stop and remove both rank containers. Their logs go to logs/ first; the caches stay on disk.
 set -uo pipefail
+# Same default as start.sh: the Mia EAQ recipe. Override with ENV_FILE=.env when needed.
+export ENV_FILE="${ENV_FILE:-.env.mia-eaq}"
 # shellcheck source=scripts/common.sh
 . "$(dirname "$0")/scripts/common.sh"
 
