@@ -1,12 +1,17 @@
-# Shared by start.sh, stop.sh, status.sh and verify.sh: reads .env and defines the helpers. Source it; do not run it.
+# Shared by start.sh, stop.sh, status.sh and verify.sh: reads the selected env file and defines the helpers.
+# Source it; do not run it.
 # shellcheck shell=bash
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# ENV_FILE selects an alternate recipe file (for example .env.mia-eaq); the default is still .env.
-ENV_FILE="${ENV_FILE:-$ROOT/.env}"
+# This checkout runs variant A (Mia EAQ + Python TensorFold) by default. ENV_FILE=.env selects the LibertAI recipe.
+ENV_FILE="${ENV_FILE:-$ROOT/.env.mia-eaq}"
 case "$ENV_FILE" in /*) ;; *) ENV_FILE="$ROOT/$ENV_FILE" ;; esac
 if [ ! -f "$ENV_FILE" ]; then
-  echo "no $ENV_FILE: copy .env.example to .env and edit it" >&2
+  if [[ "$ENV_FILE" == */.env.mia-eaq ]]; then
+    echo "no $ENV_FILE: cp $ROOT/.env.mia-eaq.example $ENV_FILE (or run scripts/bootstrap-mia-eaq.sh)" >&2
+  else
+    echo "no $ENV_FILE: copy .env.example to .env and edit it" >&2
+  fi
   exit 1
 fi
 set -a

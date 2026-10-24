@@ -11,7 +11,7 @@
 #   --yes, -y    do not ask for confirmation (sudo still asks for its password)
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-ENV_FILE="${ENV_FILE:-$ROOT/.env}"
+ENV_FILE="${ENV_FILE:-$ROOT/.env.mia-eaq}"
 case "$ENV_FILE" in /*) ;; *) ENV_FILE="$ROOT/$ENV_FILE" ;; esac
 ACTION=set
 ASSUME_YES=0
@@ -28,7 +28,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 case "$ENV_FILE" in /*) ;; *) ENV_FILE="$ROOT/$ENV_FILE" ;; esac
-[ -f "$ENV_FILE" ] || { echo "no $ENV_FILE" >&2; exit 1; }
+[ -f "$ENV_FILE" ] || { echo "no $ENV_FILE: cp .env.mia-eaq.example .env.mia-eaq (or run scripts/bootstrap-mia-eaq.sh)" >&2; exit 1; }
 # shellcheck disable=SC1090
 set -a; . "$ENV_FILE"; set +a
 
