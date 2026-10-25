@@ -1,0 +1,23 @@
+[Unit]
+Description=DeepSeek-V4.1-Flash-1017 on TensorFold (two Sparks)
+After=tfv41-prestart.service docker.service network-online.target
+Requires=tfv41-prestart.service
+Wants=network-online.target docker.service
+
+[Service]
+User=spark1
+Group=spark1
+SupplementaryGroups=docker
+Environment=HOME=/home/spark1
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+WorkingDirectory=/home/spark1/projects/DeepSeek-V4.1-Flash-1017-EXL3-TensorFold-2x-DGX-Spark
+ExecStart=/home/spark1/tfv41-boot/boot-server.sh
+ExecStop=/home/spark1/projects/DeepSeek-V4.1-Flash-1017-EXL3-TensorFold-2x-DGX-Spark/stop.sh
+Restart=on-failure
+RestartSec=30
+TimeoutStopSec=120
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

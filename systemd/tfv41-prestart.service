@@ -1,0 +1,15 @@
+[Unit]
+Description=TensorFold pre-start: GPU clock and CX7 MTU
+After=NetworkManager.service nvidia-persistenced.service
+Wants=network-online.target
+Before=tfv41-server.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/spark1/tfv41-boot/boot-prestart.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
