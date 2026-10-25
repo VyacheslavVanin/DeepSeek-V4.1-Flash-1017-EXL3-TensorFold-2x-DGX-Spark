@@ -24,6 +24,21 @@ On a node the runtime copies are in `/home/spark1/tfv41-boot/`. Edit
 copy and run `./install-boot.sh` again to sync both nodes, or edit the copies
 directly on each node.
 
+## First checkout
+
+```bash
+cd /home/spark1/projects/DeepSeek-V4.1-Flash-1017-EXL3-TensorFold-2x-DGX-Spark
+./prepare.sh          # models, Docker image, view, sync to worker, CUDA extensions
+./install-boot.sh     # boot units (asks for sudo)
+sudo reboot           # both Sparks; or start the units now, see below
+```
+
+`./prepare.sh --check` only reports what is present/missing; it downloads nothing.
+`prepare.sh` creates `.env.mia-eaq` from the tracked example if it is missing; review
+`WORKER_SSH`/`HEAD_IP`/`WORKER_IP` before the first run if they differ.
+
+The first service start writes the ~100 GiB rank caches on each node (~15 min).
+
 ## Install (once, on the head)
 
 ```bash
